@@ -1,0 +1,85 @@
+﻿@page "/"
+@using System.Text
+
+<PageTitle>Home</PageTitle>
+ 
+<div class="input-group mb-3">
+    <input @bind="password" readonly="readonly" type="text" class="form-control">
+    <span @onmouseenter="@(()=> OnEmojiHover("copy"))"@onmouseleave="OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverCopyCss" id="basic-addon2">📄</span>
+    <span @onclick="HandleGeneratePasswordClick" @onmouseenter="@(()=> OnEmojiHover("generate"))"@onmouseleave="OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverGenerateCss" id="basic-addon3">🔄</span>
+    <span @onclick="HandleSavePasswordClick" @onmouseenter="@(()=> OnEmojiHover("save"))"@onmouseleave="OnEmojiMouseLeft" class="input-group-text my-clickable-button @onHoverSaveCss" id="basic-addon4">💾</span>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        💾 Saved Passwords
+    </div>
+    <div class="card-body">
+        <ul class="list-group mb-3">
+          @foreach(var savedPassword in savedPasswords)
+          {
+              <li class="list-group-item">@savedPassword</li>
+          }
+        </ul>
+    </div>
+</div>
+@code
+{
+    private string password = string.Empty;
+    private int passwordLength = 6;
+    private HashSet<string> savedPasswords = [];
+    
+    private string onHoverCopyCss = string.Empty;
+    private string onHoverGenerateCss = string.Empty;
+    private string onHoverSaveCss = string.Empty;
+
+    private static Random random = new Random();
+    private static StringBuilder stringBuilder = new StringBuilder();
+
+    private const string alLowercaseLetters = "abcdefghijklmnoprtuvwxyz";
+    
+        
+    private void HandleSavePasswordClick()
+    {
+        if(string.IsNullOrEmpty(password) || savedPasswords.Any(x=> x==password))
+            return;
+        savedPasswords.Add(password);
+    }
+    
+    private void HandleGeneratePasswordClick()
+    {
+        stringBuilder.Clear();
+        
+        for (int i = 0; i < passwordLength; i++)
+        { 
+            stringBuilder.Append(random.Next(0, 10));
+        }
+
+        password = stringBuilder.ToString();
+    }
+
+    private void OnEmojiHover(string iconType)
+    {
+        switch (iconType)
+        {
+            case "copy":
+                onHoverCopyCss = "bg-secondary";
+                break;
+            case "generate":
+                onHoverGenerateCss = "bg-secondary";
+                break;
+            case "save":
+                onHoverSaveCss = "bg-secondary";
+                break;
+                default:
+                break;
+        }
+    }
+
+    private void OnEmojiMouseLeft()
+    { 
+        onHoverCopyCss = string.Empty;
+        onHoverGenerateCss = string.Empty; 
+        onHoverSaveCss = string.Empty;
+    }
+}
