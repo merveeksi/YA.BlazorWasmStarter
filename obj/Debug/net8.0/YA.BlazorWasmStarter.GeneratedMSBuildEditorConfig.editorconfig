@@ -26,6 +26,10 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/Users/pc/Desktop/YA/YA.BlazorWasmStarter/Components/icons/MaterialSaveIcon.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9pY29ucy9NYXRlcmlhbFNhdmVJY29uLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [/Users/pc/Desktop/YA/YA.BlazorWasmStarter/Components/SearchBar.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50cy9TZWFyY2hCYXIucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

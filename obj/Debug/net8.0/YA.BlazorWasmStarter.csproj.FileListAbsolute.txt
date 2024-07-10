@@ -1032,3 +1032,4 @@
 /Users/pc/Desktop/YA/YA.BlazorWasmStarter/obj/Debug/net8.0/scopedcss/Components/MyButton.razor.rz.scp.css
 /Users/pc/Desktop/YA/YA.BlazorWasmStarter/obj/Debug/net8.0/scopedcss/Components/NavBar.razor.rz.scp.css
 /Users/pc/Desktop/YA/YA.BlazorWasmStarter/obj/Debug/net8.0/scopedcss/Pages/Home.razor.rz.scp.css
+/Users/pc/Desktop/YA/YA.BlazorWasmStarter/obj/Debug/net8.0/YA.BlazorWasmStarter.sourcelink.json
