@@ -2064,11 +2064,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/pc/Desktop/YA/YA.BlazorWasmStarter/YA.BlazorWasmStarter.csproj",
-      "projectName": "YA.BlazorWasmStarter",
-      "projectPath": "/Users/pc/Desktop/YA/YA.BlazorWasmStarter/YA.BlazorWasmStarter.csproj",
+      "projectUniqueName": "/Users/pc/Desktop/YA/YA.BlazorOpenAIStarter/YA.BlazorOpenAIStarter.csproj",
+      "projectName": "YA.BlazorOpenAIStarter",
+      "projectPath": "/Users/pc/Desktop/YA/YA.BlazorOpenAIStarter/YA.BlazorOpenAIStarter.csproj",
       "packagesPath": "/Users/pc/.nuget/packages/",
-      "outputPath": "/Users/pc/Desktop/YA/YA.BlazorWasmStarter/obj/",
+      "outputPath": "/Users/pc/Desktop/YA/YA.BlazorOpenAIStarter/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/pc/.nuget/NuGet/NuGet.Config"

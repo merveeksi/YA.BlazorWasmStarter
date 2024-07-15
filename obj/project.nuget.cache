@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "+UAuKWDvGV2Yhbh4gnl5ySWu/mEKjFRmpImO9VAJR6OLYXVwV0Hi/PqqnLfLR1mI0wbcvqBqgS5se7S0zB0x1A==",
+  "dgSpecHash": "HD2M526hrcNZK86JjYAeM9PcJPbiRpctlTb1+MgVQ9Kr2ZndFlWOLlfjx/FMRj2S46jl0BMq5TwQ5HR5QVvN+g==",
   "success": true,
-  "projectFilePath": "/Users/pc/Desktop/YA/YA.BlazorWasmStarter/YA.BlazorWasmStarter.csproj",
+  "projectFilePath": "/Users/pc/Desktop/YA/YA.BlazorOpenAIStarter/YA.BlazorOpenAIStarter.csproj",
   "expectedPackageFiles": [
     "/Users/pc/.nuget/packages/microsoft.aspnetcore.authorization/8.0.6/microsoft.aspnetcore.authorization.8.0.6.nupkg.sha512",
     "/Users/pc/.nuget/packages/microsoft.aspnetcore.components/8.0.6/microsoft.aspnetcore.components.8.0.6.nupkg.sha512",
