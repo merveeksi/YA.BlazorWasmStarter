@@ -1,408 +1,64 @@
 ﻿@page "/"
-@using System.Text
-@using YA.BlazorWasmStarter.Enums
-@inject NavigationManager Navigation
-@inject IToastService ToastService
-@inject IJSRuntime JsRuntime
+@using OpenAI.Interfaces
+@using OpenAI.Interfaces
+@inject IOpenAIService OpenAiService
+
 
 <PageTitle>Home</PageTitle>
 
-<div class="d-flex flex-column align-items-center vh-100">
-    <div class="card shadow-lg w-100 mx-2 mx-md-0 mb-3" style="max-width: 960px;">
-        <div class="card-header gradient-header text-white d-flex align-items-center animate-header">
-            <span class="me-2 fs-4 animate-icon">🔒</span>
-            <h3 class="mb-0 animate-title">Password Generator</h3>
-        </div>
-        <div class="card-body animate-card">
 
-            <div class="input-group mb-4">
-                <input @bind="password" readonly="readonly" type="text" class="form-control form-control-lg" placeholder="Generated Password">
-                <button @onmouseenter="@(() => OnEmojiHover("copy"))" @onmouseleave="@OnEmojiMouseLeft" @onclick="@(() => CopyPasswordToClipboard(string.Empty))" class="btn btn-outline-secondary my-clickable-button @onHoverCopyCss animate-button" id="basic-addon2">📄</button>
-                <button @onclick="HandleGeneratePasswordClick" @onmouseenter="@(() => OnEmojiHover("generate"))" @onmouseleave="@OnEmojiMouseLeft" class="btn btn-outline-secondary my-clickable-button @onHoverGenerateCss animate-button" id="basic-addon3">🔄</button>
-                <button @onclick="HandleSavePasswordClick" @onmouseenter="@(() => OnEmojiHover("save"))" @onmouseleave="@OnEmojiMouseLeft" class="btn btn-outline-secondary my-clickable-button @onHoverSaveCss animate-button" id="basic-addon4">💾</button>
-            </div>
-
-            <div class="mb-4 animate-checkboxes">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeNumbers" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Numbers))">
-                    <label class="form-check-label">Numbers</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeLowercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Lowercase))">
-                    <label class="form-check-label">Lowercase</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeUppercase" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.Uppercase))">
-                    <label class="form-check-label">Uppercase</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="checkbox" @bind="@includeSpecialChars" @oninput="@((args) => HandleCheckboxOnChange(args,CheckBoxActionType.SpecialChars))">
-                    <label class="form-check-label">Special Chars</label>
-                </div>
-            </div>
-
-            <div class="container">
-                <h5 class="mb-3">Password Length</h5>
-                <div class="row align-items-center">
-                    <div class="col-md-2 mb-2 mb-md-0">
-                        <input @bind=@passwordLength type="number" class="form-control form-control-sm" min="6" max="50" @oninput="HandlePasswordLengthInputOnChange"/>
-                    </div>
-                    <div class="col-md-8 mb-2 mb-md-0">
-                        <input type="range" class="form-range" step="1" min="6" max="50" @bind="passwordLength" @oninput="HandleRangeOnChange"/>
-                    </div>
-                </div>
+<div class="container mx-auto p-4">
+    <div class="card bg-base-200 shadow-xl mb-8">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Enter Your Prompt</h2>
+            <textarea @bind=@prompt class="textarea textarea-bordered textarea-lg w-full mb-4" placeholder="Type your prompt here..."></textarea>
+            <div class="card-actions justify-end">
+                <button class="btn btn-primary" @onclick="GenerateAsync">Generate</button>
             </div>
         </div>
     </div>
 
-    <div class="card shadow-lg w-100 mx-2 mx-md-0" style="max-width: 960px;">
-        <div class="card-header gradient-header text-white d-flex align-items-center animate-header">
-            <span class="me-2 fs-4 animate-icon">💾</span>
-            <h3 class="mb-0 animate-title">Saved Passwords</h3>
-        </div>
-        <div class="card-body animate-card">
-            @if (savedPasswords.Any())
-            {
-            <ul class="list-group">
-                @foreach (var savedPassword in savedPasswords)
-                {
-                <li class="list-group-item animate-list-item d-flex justify-content-between">
-                    <span>@savedPassword</span>
-                    <div>
-                        <button class="btn btn-outline-info ms-auto" type="button" @onclick="@(() => CopyPasswordToClipboard(savedPassword))">📄</button>
-                        <button class="btn btn-outline-danger ms-auto" type="button" @onclick="@(() => HandleDeleteButtonClick(savedPassword))">🗑️</button>
-                    </div>
-                </li>
-                }
-            </ul>
-            }
-            else
-            {
-            <h5 class="text-center text-muted">There aren't any saved passwords.</h5>
-            }
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Generated Result</h2>
+            <div class="bg-base-200 p-4 rounded-lg min-h-[100px]">
+                <pre><code class="text-base-content">
+                    @generatedContent
+                </code></pre>
+            </div>
         </div>
     </div>
 </div>
+
 @code
 {
+    private string prompt = string.Empty;
+    private string generatedContent = string.Empty;
 
-private string password = string.Empty;
-private int passwordLength = 12;
-private HashSet<string> savedPasswords = [];
-
-private string onHoverCopyCss = string.Empty;
-private string onHoverGenerateCss = string.Empty;
-private string onHoverSaveCss = string.Empty;
-
-private static Random random = new Random();
-private static StringBuilder stringBuilder = new StringBuilder();
-
-private bool includeLowercase = true;
-private bool includeUppercase = true;
-private bool includeNumbers = true;
-private bool includeSpecialChars = true;
-
-private const string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
-private const string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-private const string numbers = "0123456789";
-private const string specialCharacters = "!@#$%&*()_+-={};:?";
-
-// allLowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
-// allUppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-// allNumbers = "0123456789";
-// allSpecialCharacters = "!@#$%^&*()_+-=[]{}|;':,.<>?";
-// Istanbul Lat/Long: 41.0082° N, 28.9784° E
-
-protected override void OnInitialized()
-{
-GeneratePassword();
-
-base.OnInitialized();
-}
-
-private void HandleDeleteButtonClick(string passwordToDelete)
-{
-savedPasswords.Remove(passwordToDelete);
-
-ToastService.ShowSuccess("The selected password deleted.");
-}
-
-async Task CopyPasswordToClipboard(string? passwordToCopy)
-{
-if (string.IsNullOrWhiteSpace(passwordToCopy))
-await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", password);
-
-else
-await JsRuntime.InvokeVoidAsync("navigator.clipboard.writeText", passwordToCopy);
-
-
-ToastService.ShowSuccess("The password copied.");
-}
-
-
-private void HandlePasswordLengthInputOnChange(ChangeEventArgs args)
-{
-if (args.Value is null)
-return;
-
-passwordLength = Convert.ToInt32(args.Value);
-
-GeneratePassword();
-}
-
-private void HandleRangeOnChange(ChangeEventArgs args)
-{
-if (args.Value is null)
-return;
-
-passwordLength = Convert.ToInt32(args.Value);
-
-GeneratePassword();
-}
-
-private void HandleSavePasswordClick()
-{
-if (string.IsNullOrEmpty(password) || savedPasswords.Any(x => x == password))
-return;
-
-savedPasswords.Add(password);
-
-ToastService.ShowInfo("The selected password saved!");
-}
-
-private void HandleCheckboxOnChange(ChangeEventArgs args, CheckBoxActionType actionType)
-{
-if (args.Value is null)
-return;
-
-var result = actionType switch
-{
-CheckBoxActionType.SpecialChars => includeSpecialChars = (bool)args.Value,
-CheckBoxActionType.Numbers => includeNumbers = (bool)args.Value,
-CheckBoxActionType.Uppercase => includeUppercase = (bool)args.Value,
-CheckBoxActionType.Lowercase => includeLowercase = (bool)args.Value,
-_ => throw new ArgumentException("Geçersiz CheckBoxActionType", nameof(actionType))
-};
-
-GeneratePassword();
-}
-
-private void HandleGeneratePasswordClick()
-{
-GeneratePassword();
-}
-
-private void GeneratePassword()
-{
-stringBuilder.Clear();
-
-var validChars = new StringBuilder();
-
-// allLowercaseLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-if (includeLowercase)
-validChars.Append(lowercaseLetters);
-
-if (includeUppercase)
-validChars.Append(uppercaseLetters);
-
-if (includeNumbers)
-validChars.Append(numbers);
-
-if (includeSpecialChars)
-validChars.Append(specialCharacters);
-
-if (!includeUppercase && !includeLowercase && !includeNumbers && !includeSpecialChars)
-{
-includeNumbers = true;
-validChars.Append(numbers);
-}
-
-
-for (int i = 0; i < passwordLength; i++)
-{
-var randomIndex = random.Next(0, validChars.Length);
-
-stringBuilder.Append(validChars[randomIndex]);
-
-}
-
-password = stringBuilder.ToString();
-}
-
-private void OnEmojiHover(string iconType)
-{
-switch (iconType)
-{
-case "copy":
-onHoverCopyCss = "bg-secondary";
-break;
-
-case "generate":
-onHoverGenerateCss = "bg-secondary";
-break;
-
-case "save":
-onHoverSaveCss = "bg-secondary";
-break;
-
-default:
-
-break;
-}
-}
-
-private void OnEmojiMouseLeft()
-{
-onHoverCopyCss = string.Empty;
-onHoverGenerateCss = string.Empty;
-onHoverSaveCss = string.Empty;
-}
-}
-
-
-<style>
-    .card {
-        border-radius: 1rem;
-    }
-    .card-header {
-        border-top-left-radius: 1rem;
-        border-top-right-radius: 1rem;
-    }
-
-    .gradient-header {
-        background: #005C97; /* fallback for old browsers */
-        background: -webkit-linear-gradient(to right, #363795, #005C97); /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(to right, #363795, #005C97); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    }
-    .form-control-lg {
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
-    }
-    .input-group-text {
-        cursor: pointer;
-    }
-    .input-group-text:hover {
-        background-color: #f8f9fa;
-    }
-    .my-clickable-button {
-        border-top-left-radius: 0;
-        border-bottom-left-radius: 0;
-    }
-    .form-check-label {
-        margin-left: 0.5rem;
-    }
-    .badge {
-        font-size: 1rem;
-    }
-    .shadow-lg {
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-    .vh-100 {
-        height: 100vh;
-    }
-    @@media (max-width: 960px) {
-        .card {
-            margin: 0 1rem;
+    private async Task GenerateAsync()
+    {
+        try
+        {
+            var completionResult = await OpenAiService.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
+            {
+                Messages = new List<ChatMessage>
+                {
+                    ChatMessage.FromSystem("Sen şiir ve şarkı sözü yazmakta usta bir asistansın. Görevin, kullanıcıya şiir ve şarkı sözleri yazmakta yol göstermek, yardımcı olmak ve çözüm üretmektir."),
+                    ChatMessage.FromUser(prompt),
+                },
+                Model = Models.Gpt_4o,
+                MaxTokens = 4096,
+            });
+            if (completionResult.Successful)
+            {
+                generatedContent = completionResult.Choices.First().Message.Content;
+                Console.WriteLine((bool)completionResult.Choices.First().Message.Content);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            throw;
         }
     }
-
-    /* Animations */
-    .animate-header {
-        animation: fadeInDown 1s;
-    }
-    .animate-card {
-        animation: fadeIn 1.5s;
-    }
-    .animate-icon {
-        animation: bounce 2s infinite;
-    }
-    .animate-title {
-        animation: fadeInLeft 1s;
-    }
-    .animate-button {
-        transition: transform 0.2s;
-    }
-    .animate-button:hover {
-        transform: scale(1.1);
-    }
-    .animate-checkboxes {
-        animation: fadeInRight 1s;
-    }
-    .animate-list {
-        animation: fadeInUp 1.5s;
-    }
-    .animate-list-item {
-        opacity: 0;
-        transform: translateY(20px);
-        animation: fadeInUp 1s forwards;
-    }
-
-    @@keyframes fadeInDown {
-         from {
-             opacity: 0;
-             transform: translateY(-20px);
-         }
-         to {
-             opacity: 1;
-             transform: translateY(0);
-         }
-     }
-    @@keyframes fadeIn {
-         from {
-             opacity: 0;
-         }
-         to {
-             opacity: 1;
-         }
-     }
-    @@keyframes bounce {
-         0%, 20%, 50%, 80%, 100% {
-             transform: translateY(0);
-         }
-         40% {
-             transform: translateY(-10px);
-         }
-         60% {
-             transform: translateY(-5px);
-         }
-     }
-    @@keyframes fadeInLeft {
-         from {
-             opacity: 0;
-             transform: translateX(-20px);
-         }
-         to {
-             opacity: 1;
-             transform: translateX(0);
-         }
-     }
-    @@keyframes fadeInRight {
-         from {
-             opacity: 0;
-             transform: translateX(20px);
-         }
-         to {
-             opacity: 1;
-             transform: translateX(0);
-         }
-     }
-    @@keyframes fadeInUp {
-         from {
-             opacity: 0;
-             transform: translateY(20px);
-         }
-         to {
-             opacity: 1;
-             transform: translateY(0);
-         }
-     }
-    @@keyframes fadeOut {
-         from {
-             opacity: 1;
-         }
-         to {
-             opacity: 0;
-         }
-     }
-</style>
+}

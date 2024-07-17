@@ -6,5 +6,4 @@ public enum CheckBoxActionType
     Lowercase = 2,
     Uppercase = 3,
     SpecialChars = 4
-    
 }
