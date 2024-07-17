@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "osxPLII0dT0=",
+  "dgSpecHash": "xCVT+lTTESyBoAtxm+KYP3q8R4DVIulOTLyOsXr5LM6Kij6nkPJAVeXyqeaYXsjQ/AU/ABhx6XND+ov8jxdpTg==",
   "success": true,
   "projectFilePath": "/Users/pc/Desktop/YA/YA.BlazorOpenAIStarter/YA.BlazorOpenAIStarter.csproj",
   "expectedPackageFiles": [
@@ -29,7 +29,7 @@
     "/Users/pc/.nuget/packages/microsoft.extensions.primitives/8.0.0/microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "/Users/pc/.nuget/packages/microsoft.jsinterop/8.0.6/microsoft.jsinterop.8.0.6.nupkg.sha512",
     "/Users/pc/.nuget/packages/microsoft.jsinterop.webassembly/8.0.6/microsoft.jsinterop.webassembly.8.0.6.nupkg.sha512",
-    "/Users/pc/.nuget/packages/microsoft.net.illink.tasks/8.0.6/microsoft.net.illink.tasks.8.0.6.nupkg.sha512",
+    "/Users/pc/.nuget/packages/microsoft.net.illink.tasks/8.0.5/microsoft.net.illink.tasks.8.0.5.nupkg.sha512",
     "/Users/pc/.nuget/packages/microsoft.net.sdk.webassembly.pack/8.0.6/microsoft.net.sdk.webassembly.pack.8.0.6.nupkg.sha512",
     "/Users/pc/.nuget/packages/system.io.pipelines/8.0.0/system.io.pipelines.8.0.0.nupkg.sha512",
     "/Users/pc/.nuget/packages/system.text.encodings.web/8.0.0/system.text.encodings.web.8.0.0.nupkg.sha512",
